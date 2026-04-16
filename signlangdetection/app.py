@@ -1,10 +1,14 @@
 from function import *
-from keras.utils import to_categorical
-from keras.models import model_from_json
-from keras.layers import LSTM, Dense
-from keras.callbacks import TensorBoard
+from tensorflow.keras.utils import to_categorical
+from tensorflow.keras.models import model_from_json
+from tensorflow.keras.layers import LSTM, Dense
+from tensorflow.keras.callbacks import TensorBoard
 from gtts import gTTS
 import os
+import json
+import cv2
+import numpy as np
+import mediapipe as mp
 
 # Function to convert text to speech
 def text_to_speech(text):
@@ -44,6 +48,8 @@ with mp_hands.Hands(model_complexity=0, min_detection_confidence=0.5, min_tracki
     while cap.isOpened():
         # Read feed
         ret, frame = cap.read()
+        if not ret or frame is None:
+            continue
 
         # Make detections
         cropframe = frame[40:400, 0:300]
@@ -98,7 +104,7 @@ with mp_hands.Hands(model_complexity=0, min_detection_confidence=0.5, min_tracki
         cv2.imshow('OpenCV Feed', frame)
 
         # Break gracefully
-        if cv2.waitKey(10) & 0xFF == ord('q'):
+        if cv2.waitKey(10) & 0xFF == ord('q') or cv2.waitKey(10) & 0xFF == 27:
             break
 
     cap.release()

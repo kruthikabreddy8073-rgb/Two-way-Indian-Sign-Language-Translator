@@ -2,14 +2,23 @@ import tkinter as tk
 from tkinter import ttk
 from PIL import Image, ImageTk
 import subprocess
+import sys
 
 def predict_sign():
-    # Execute the "app.py" script
-    subprocess.Popen(["python", "app.py"])
+    # Execute app.py in parent .venv (absolute paths)
+    import os
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    venv_python = os.path.join(script_dir, "..", ".venv", "Scripts", "python.exe")
+    app_path = os.path.join(script_dir, "app.py")
+    subprocess.Popen([venv_python, app_path], cwd=script_dir)
 
 def convert_to_text():
-    # Execute the "reverse_recognition.py" script
-    subprocess.Popen(["python", "reverse_recognition.py"])
+    # Execute reverse_recognition_fixed.py in parent .venv (absolute paths)
+    import os
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    venv_python = os.path.join(script_dir, "..", ".venv", "Scripts", "python.exe")
+    fixed_path = os.path.join(script_dir, "reverse_recognition_fixed.py")
+    subprocess.Popen([venv_python, fixed_path], cwd=script_dir)
 
 def exit_program():
     # Exit the program
