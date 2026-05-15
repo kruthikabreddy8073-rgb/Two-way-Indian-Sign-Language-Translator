@@ -1,4 +1,11 @@
+# Allow running app.py from different working directories (UI.py, terminal, etc.)
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 from function import *
+
+
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.models import model_from_json
 from tensorflow.keras.layers import LSTM, Dense
@@ -17,11 +24,39 @@ def text_to_speech(text):
     os.system("start output.mp3")  # For Windows, for other OS, use appropriate command
 
 # Load the trained model
-json_file = open("model.json", "r")
-model_json = json_file.read()
-json_file.close()
-model = model_from_json(model_json)
-model.load_weights("model.h5")
+# NOTE: use absolute paths relative to this file so it works when launched
+# from UI.py or a different working directory.
+from tensorflow.keras.models import load_model
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_H5_PATH = os.path.join(BASE_DIR, "model.h5")
+
+# Keras/TF 2.15+ may fail deserializing legacy H5/JSON containing
+# InputLayer(batch_shape). To avoid this entirely, we reconstruct the
+# architecture used during training and then load only the weights.
+#
+# Architecture (from trainmodel.py):
+# LSTM(64, return_sequences=True, input_shape=(30,63))
+# LSTM(128, return_sequences=True)
+# LSTM(64, return_sequences=False)
+# Dense(64) -> Dense(32) -> Dense(num_classes)
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import LSTM, Dense
+
+model = Sequential()
+model.add(LSTM(64, return_sequences=True, activation='relu', input_shape=(30, 63)))
+model.add(LSTM(128, return_sequences=True, activation='relu'))
+model.add(LSTM(64, return_sequences=False, activation='relu'))
+model.add(Dense(64, activation='relu'))
+model.add(Dense(32, activation='relu'))
+model.add(Dense(actions.shape[0], activation='softmax'))
+
+model.load_weights(MODEL_H5_PATH)
+
+
+
+
+
 
 # Define colors for visualization
 colors = [(245,117,16) for _ in range(20)]

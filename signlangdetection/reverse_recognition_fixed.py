@@ -60,8 +60,7 @@ def main():
     root = tk.Tk()
     root.withdraw()
     try:
-        while True:
-            display_video()
+        display_video()
     except tk.TclError:
         pass
     finally:
