@@ -62,3 +62,4 @@ To use the ISL translator:
 <br><strong>Text to Sign Conversion</strong>
 <br>
 <img src="Result%20images/5.png" alt="Text to Sign Conversion" width="300"/>
+
